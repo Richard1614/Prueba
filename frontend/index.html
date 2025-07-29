@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <title>Formulario con API de Supabase</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Carga el cliente de Supabase -->
+    <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+    <style>
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+        #miFormulario {
+            margin: 10px auto;
+            width: 200px;
+            padding: 20px;
+            background-color: beige;
+        }
+    </style>
+</head>
+<body>
+    <h1>Registro de Usuario</h1>
+    <form id="miFormulario">
+        <input type="text" id="nombre" placeholder="Nombre" required>
+        <input type="email" id="email" placeholder="Email" required>
+        <button type="submit">Enviar</button>
+    </form>
+
+<script>
+    // 1. Configuración de Supabase - Versión a prueba de errores
+    const initSupabase = () => {
+        const supabaseUrl = "https://owyucmmgvcvkzqdmlihd.supabase.co";
+        const supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im93eXVjbW1ndmN2a3pxZG1saWhkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTM4MjY0MTksImV4cCI6MjA2OTQwMjQxOX0.DBpgT5WNCRDjWZMk8D0z4Rm0RqutSrxSq5yMI9N_KTQ"; // Usa tu clave real aquí
+        
+        // 2. Inicialización segura con verificación
+        if (typeof supabase !== 'undefined') {
+            return supabase.createClient(supabaseUrl, supabaseKey);
+        } else {
+            console.error("Supabase JS no está cargado");
+            return null;
+        }
+    };
+
+    // 3. Espera a que TODO esté listo
+    window.addEventListener('load', () => {
+        const supabase = initSupabase();
+        
+        if (supabase) {
+            document.getElementById('miFormulario').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                
+                const datos = {
+                    nombre: document.getElementById('nombre').value,
+                    email: document.getElementById('email').value
+                };
+
+                try {
+                    const { data, error } = await supabase
+                        .from('usuarios')
+                        .insert([datos])
+                        .select();
+
+                    if (error) throw error;
+                    alert(`Usuario ${data[0].nombre} guardado!`);
+                    e.target.reset();
+                } catch (error) {
+                    console.error("Error completo:", error);
+                    alert(`Error: ${error.message}`);
+                }
+            });
+        }
+    });
+</script>
+</body>
+</html>
