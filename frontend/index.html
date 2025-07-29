@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <title>Formulario con API de Supabase</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Carga el cliente de Supabase -->
+    <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+    <style>
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+        #miFormulario {
+            margin: 10px auto;
+            width: 200px;
+            padding: 20px;
+            background-color: beige;
+        }
+    </style>
+</head>
+<body>
+    <h1>Registro de Usuario</h1>
+    <form id="miFormulario">
+        <input type="text" id="nombre" placeholder="Nombre" required>
+        <input type="email" id="email" placeholder="Email" required>
+        <button type="submit">Enviar</button>
+    </form>
+
+    <script>
+        // Espera a que el DOM esté completamente cargado
+        document.addEventListener('DOMContentLoaded', () => {
+            // Configuración de Supabase
+            const supabaseUrl = "https://owyucmmgvcvkzqdmlihd.supabase.co";
+            const supabaseKey = "TU_ANON_KEY"; // Considera usar variables de entorno en producción
+            const supabase = supabase.createClient(supabaseUrl, supabaseKey);
+
+            document.getElementById('miFormulario').addEventListener('submit', async (e) => {
+                e.preventDefault();
+
+                const datos = {
+                    nombre: document.getElementById('nombre').value,
+                    email: document.getElementById('email').value
+                };
+
+                try {
+                    const { data, error } = await supabase
+                        .from('usuarios')
+                        .insert([datos])
+                        .select();
+
+                    if (error) throw error;
+                    
+                    alert(`Usuario ${data[0].nombre} guardado con ID: ${data[0].id}`);
+                    document.getElementById('miFormulario').reset();
+                
+                } catch (error) {
+                    console.error("Error:", error);
+                    alert(`Error: ${error.message}`);
+                }
+            });
+        });
+    </script>
+</body>
+</html>
